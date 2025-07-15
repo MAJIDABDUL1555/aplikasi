@@ -1,66 +1,230 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+@extends('layouts.presensi')
+@section('content')
+<div class="section" id="user-section">
+    <div id="user-detail">
+        <div class="avatar">
+            @if (!@empty(Auth::guard('karyawan')->user()->foto))
+            @php
+                $path = Storage::url('uploads/karyawan/'.Auth::guard('karyawan')->user()->foto);
+            @endphp
+            <img src="{{ url($path) }}" alt="avatar" class="imaged w64" style="height: 60px">
+                @else
+                <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">
+            @endif
+        </div>
+        <div id="user-info">
+            <h2 id="user-name">{{ Auth::guard('karyawan')->user()->nama_lengkap }}</h2>
+            <span id="user-role">{{ Auth::guard('karyawan')->user()->jabatan }}</span>
+        </div>
+    </div>
+</div>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<div class="section" id="menu-section">
+    <div class="card">
+        <div class="card-body text-center">
+            <div class="list-menu">
+                <div class="item-menu text-center">
+                    <div class="menu-icon">
+                        <a href="/editprofile" class="green" style="font-size: 40px;">
+                            <ion-icon name="person-sharp"></ion-icon>
+                        </a>
+                    </div>
+                    <div class="menu-name">
+                        <span class="text-center">Profil</span>
+                    </div>
+                </div>
+                <div class="item-menu text-center">
+                    <div class="menu-icon">
+                        <a href="/presensi/izin" class="danger" style="font-size: 40px;">
+                            <ion-icon name="calendar-number"></ion-icon>
+                        </a>
+                    </div>
+                    <div class="menu-name">
+                        <span class="text-center">Cuti</span>
+                    </div>
+                </div>
+                <div class="item-menu text-center">
+                    <div class="menu-icon">
+                        <a href="/presensi/histori" class="warning" style="font-size: 40px;">
+                            <ion-icon name="document-text"></ion-icon>
+                        </a>
+                    </div>
+                    <div class="menu-name">
+                        <span class="text-center">Histori</span>
+                    </div>
+                </div>
+                <div class="item-menu text-center">
+                    <div class="menu-icon">
+                        <a href="" class="orange" style="font-size: 40px;">
+                            <ion-icon name="location"></ion-icon>
+                        </a>
+                    </div>
+                    <div class="menu-name">
+                        Lokasi
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="section mt-2" id="presence-section">
+    <div class="todaypresence">
+        <div class="row">
+            
+            <div class="col-6">
+                <div class="card gradasigreen">
+                    <div class="card-body">
+                        <div class="presencecontent">
+                            <div class="iconpresence">
+                                @if ($presensihariini)
+                                @php
+                                $path = Storage::url('uploads/absensi/'. $presensihariini->foto_in)
+                                @endphp
+                                <img src="{{ url($path) }}" alt="" class="imaged w48">
+                                @else
+                                <ion-icon name="camera"></ion-icon>
+                                @endif
+                                
+                            </div>
+                            <div class="presencedetail">
+                                <h4 class="presencetitle">Masuk</h4>
+                                <span>{{ $presensihariini  ? $presensihariini->jam_in : 'Belum Absen' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card gradasired">
+                    <div class="card-body">
+                        <div class="presencecontent">
+                            <div class="iconpresence">
+                                @if ($presensihariini && $presensihariini->jam_out)
+                                @php
+                                $path = Storage::url('uploads/absensi/'. $presensihariini->foto_out)
+                                @endphp
+                                <img src="{{ url($path) }}" alt="" class="imaged w48">
+                                @else
+                                <ion-icon name="camera"></ion-icon>
+                                @endif
+                            </div>
+                            <div class="presencedetail">
+                                <h4 class="presencetitle">Pulang</h4>
+                                <span>{{ $presensihariini  ? $presensihariini->jam_out : 'Belum Absen' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-## About Laravel
+    <div id="rekappresensi">
+        <h3>Rekap Presensi Bulan {{ $namabulan[$bulanini] }} Tahun {{ $tahunini }}</h3>
+        <div class="row">
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-body text-center" style="padding: 12px 12px !important; line-height:0.8rem">
+                        <span class="badge bg-danger" style="position: absolute; top:3px; right: 10px; font-size:0.6rem; z-index:999">{{ $rekappresensi->jmlhadir }}</span>
+                        <ion-icon name="accessibility-outline" style="font-size: 1.6rem;" class="text-primary mb-1"></ion-icon>
+                        <br>
+                        <span style="font-size: 0.8rem; font-weight:500">Hadir</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-body text-center" style="padding: 12px 12px !important; line-height:0.8rem">
+                        <span class="badge bg-danger" style="position: absolute; top:3px; right: 10px; font-size:0.6rem; z-index:999">{{ $rekapizin->jmlizin }}</span>
+                        <ion-icon name="newspaper-outline" style="font-size: 1.6rem;" class="text-success mb-1"></ion-icon>
+                        <br>
+                        <span style="font-size: 0.8rem; font-weight:500">Izin</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-body text-center" style="padding: 12px 12px !important; line-height:0.8rem">
+                        <span class="badge bg-danger" style="position: absolute; top:3px; right: 10px; font-size:0.6rem; z-index:999">{{ $rekapizin->jmlsakit }}</span>
+                        <ion-icon name="medkit-outline" style="font-size: 1.6rem;" class="text-warning mb-1"></ion-icon>
+                        <br>
+                        <span style="font-size: 0.8rem; font-weight:500">Sakit</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-body text-center" style="padding: 12px 12px !important; line-height:0.8rem">
+                        <span class="badge bg-danger" style="position: absolute; top:3px; right: 10px; font-size:0.6rem; z-index:999">{{ $rekappresensi->jmlterlambat }}</span>
+                        <ion-icon name="alarm-outline" style="font-size: 1.6rem;" class="text-danger mb-1"></ion-icon>
+                        <br>
+                        <span style="font-size: 0.8rem; font-weight:500">Telat</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="presencetab mt-2">
+        <div class="tab-pane fade show active" id="pilled" role="tabpanel">
+            <ul class="nav nav-tabs style1" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#home" role="tab">
+                        Bulan Ini
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#profile" role="tab">
+                        Leaderboard
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content mt-2" style="margin-bottom:100px;">
+            <div class="tab-pane fade show active" id="home" role="tabpanel">
+                <ul class="listview image-listview">
+                    @foreach ($historibulanini as $d)
+                    @php
+                        $path = Storage::url('uploads/absensi/'.$d->foto_in);
+                    @endphp
+                    <li>
+                        <div class="item">
+                            <div class="icon-box bg-primary">
+                                <ion-icon name="finger-print-outline"></ion-icon>
+                            </div>
+                            <div class="in">
+                                <div>{{ date("d-m-Y", strtotime($d->tgl_presensi)) }}</div>
+                                <span class="badge badge-success">{{ $d->jam_in }}</span>
+                                <span class="badge badge-danger">{{  $d->jam_out }}</span>
+                            </div>
+                        </div>
+                    </li>
+                    @endforeach
+                    
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel">
+                <ul class="listview image-listview">
+                    @foreach ($leaderboard as $d)
+                    <li>
+                        <div class="item">
+                            <img src="{{ asset('assets/img/sample/avatar/avatar1.jpg') }}" alt="image" class="image">
+                            <div class="in">
+                                <div>
+                                   <b> {{ $d->nama_lengkap }}</b><br>
+                                    <small class="text-muted">{{ $d->jabatan }}</small>
+                                </div>
+                                <span class="badge {{ $d->jam_in < "07:00" ? "bg-success" : "bg-danger" }}">
+                                    {{ $d->jam_in }}
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                    @endforeach
+                   
+                 </ul>
+            </div>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+        </div>
+    </div>
+</div>
+@endsection
